@@ -42,8 +42,13 @@ public class ProjectSecurityConfig {
                         "/courses",
                         "/about",
                         "/assets/**",
+                        "/favicon.ico",
+                        "/error",
+                        "/login",
                         "/login/**")
-                    .permitAll())
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated())
         .formLogin(
             flc ->
                 flc.loginPage("/login")
