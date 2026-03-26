@@ -34,9 +34,15 @@ public class ProjectSecurityConfig {
                         "/saveMsg",
                         "/courses",
                         "/about",
-                        "/assets/**", "/login/**")
+                        "/assets/**",
+                        "/login/**")
                     .permitAll())
-        .formLogin(flc -> flc.loginPage("/login"))
+        .formLogin(
+            flc ->
+                flc.loginPage("/login")
+                    .usernameParameter("userid")
+                    .passwordParameter("secretPwd")
+                    .defaultSuccessUrl("/dashboard"))
         .httpBasic(Customizer.withDefaults());
 
     return http.build();
