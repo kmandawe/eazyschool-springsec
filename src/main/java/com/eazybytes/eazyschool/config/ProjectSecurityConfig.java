@@ -1,5 +1,8 @@
 package com.eazybytes.eazyschool.config;
 
+import com.eazybytes.eazyschool.handler.CustomAuthenticationFailureHandler;
+import com.eazybytes.eazyschool.handler.CustomAuthenticationSuccessHandler;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.password.CompromisedPasswordChecker;
@@ -15,7 +18,11 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.password.HaveIBeenPwnedRestApiPasswordChecker;
 
 @Configuration
+@RequiredArgsConstructor
 public class ProjectSecurityConfig {
+
+  private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
+  private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
 
   @Bean
   SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -42,7 +49,10 @@ public class ProjectSecurityConfig {
                 flc.loginPage("/login")
                     .usernameParameter("userid")
                     .passwordParameter("secretPwd")
-                    .defaultSuccessUrl("/dashboard"))
+                    .defaultSuccessUrl("/dashboard")
+                    .failureUrl("/login?error=true")
+                    .successHandler(customAuthenticationSuccessHandler)
+                    .failureHandler(customAuthenticationFailureHandler))
         .httpBasic(Customizer.withDefaults());
 
     return http.build();
