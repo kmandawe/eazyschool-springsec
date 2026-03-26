@@ -17,43 +17,55 @@ import org.springframework.security.web.authentication.password.HaveIBeenPwnedRe
 @Configuration
 public class ProjectSecurityConfig {
 
-    @Bean
-    SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+  @Bean
+  SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
 
-        http.csrf((csrf) -> csrf.disable())
-                .authorizeHttpRequests((requests) -> requests.requestMatchers("/dashboard").permitAll()
-                        .requestMatchers("/", "/home", "/holidays/**", "/contact", "/saveMsg",
-                                "/courses", "/about", "/assets/**").permitAll())
-                .formLogin(Customizer.withDefaults())
-                .httpBasic(Customizer.withDefaults());
+    http.csrf((csrf) -> csrf.disable())
+        .authorizeHttpRequests(
+            (requests) ->
+                requests
+                    .requestMatchers("/dashboard")
+                    .authenticated()
+                    .requestMatchers(
+                        "/",
+                        "/home",
+                        "/holidays/**",
+                        "/contact",
+                        "/saveMsg",
+                        "/courses",
+                        "/about",
+                        "/assets/**", "/login/**")
+                    .permitAll())
+        .formLogin(flc -> flc.loginPage("/login"))
+        .httpBasic(Customizer.withDefaults());
 
-        return http.build();
-    }
+    return http.build();
+  }
 
-    @Bean
-    public UserDetailsService userDetailsService() {
-        UserDetails user = User.withUsername("user")
-                .password("{noop}EazyBytes@12345").authorities("read").build();
-        UserDetails admin = User.withUsername("admin")
-                .password("{bcrypt}$2a$12$88.f6upbBvy0okEa7OfHFuorV29qeK.sVbB9VQ6J6dWM1bW6Qef8m")
-                .authorities("admin").build();
-        return new InMemoryUserDetailsManager(user, admin);
-    }
+  @Bean
+  public UserDetailsService userDetailsService() {
+    UserDetails user =
+        User.withUsername("user").password("{noop}EazyBytes@12345").authorities("read").build();
+    UserDetails admin =
+        User.withUsername("admin")
+            .password("{bcrypt}$2a$12$88.f6upbBvy0okEa7OfHFuorV29qeK.sVbB9VQ6J6dWM1bW6Qef8m")
+            .authorities("admin")
+            .build();
+    return new InMemoryUserDetailsManager(user, admin);
+  }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-    }
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+  }
 
-    /**
-     * From Spring Security 6.3 version
-     *
-     * @return
-     */
-    @Bean
-    public CompromisedPasswordChecker compromisedPasswordChecker() {
-        return new HaveIBeenPwnedRestApiPasswordChecker();
-    }
-
-
+  /**
+   * From Spring Security 6.3 version
+   *
+   * @return
+   */
+  @Bean
+  public CompromisedPasswordChecker compromisedPasswordChecker() {
+    return new HaveIBeenPwnedRestApiPasswordChecker();
+  }
 }
