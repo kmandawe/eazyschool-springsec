@@ -58,8 +58,8 @@ public class ProjectSecurityConfig {
                 loc.logoutSuccessUrl("/login?logout=true")
                     .invalidateHttpSession(true)
                     .clearAuthentication(true)
-                    .deleteCookies("JSESSIONID"))
-        .httpBasic(Customizer.withDefaults());
+                    .deleteCookies("JSESSIONID"));
+//        .httpBasic(Customizer.withDefaults());
 
     return http.build();
   }
